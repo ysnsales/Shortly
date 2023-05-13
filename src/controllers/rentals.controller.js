@@ -2,12 +2,32 @@ import { db } from "../database/database.connection.js";
 
 export async function getRentals(req, res){
     try{
-        const rentals = await db.query(
+        const getRentals = await db.query(
             `SELECT rentals.*, customers.id, customers.name, games.id, games.name FROM rentals 
             JOIN customers ON rentals."customerId" = customers.id 
             JOIN games ON rentals."gameId" = games.id;`);
-        console.table(rentals.rows);
-        res.send(rentals.rows);
+
+
+        const rentals = getRentals.rows.map((row) => ({
+            id: row.id,
+            customerId: row.customerId,
+            gameId: row.gameId,
+            rentDate: row.rentDate,
+            daysRented: row.daysRented,
+            returnDate: row.returnDate,
+            originalPrice: row.originalPrice,
+            delayFee: row.delayFee,
+            customer: {
+                id: row.customer_id,
+                name: row.customer_name,
+            },
+            game: {
+                id: row.game_id,
+                name: row.game_name,
+            },
+        }));
+
+        res.send(rentals);
     }catch (err){
         res.status(500).send(err.message);
     }
