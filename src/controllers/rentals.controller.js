@@ -2,10 +2,12 @@ import { db } from "../database/database.connection.js";
 
 export async function getRentals(req, res) {
     try{
-        const getRentals = await db.query(
-            `SELECT rentals.*, customers.id, customers.name, games.id, games.name FROM rentals 
-            JOIN customers ON rentals."customerId" = customers.id 
-            JOIN games ON rentals."gameId" = games.id;`);
+        const result = await db.query(`
+        SELECT rentals.*, customers.id AS customer_id, customers.name AS customer_name, games.id AS game_id, games.name AS game_name
+        FROM rentals
+        JOIN customers ON rentals."customerId" = customers.id
+        JOIN games ON rentals."gameId" = games.id
+      `);
 
 
         const rentals = getRentals.rows.map((row) => ({
@@ -18,12 +20,12 @@ export async function getRentals(req, res) {
             originalPrice: row.originalPrice,
             delayFee: row.delayFee,
             customer: {
-                id: row.customer.id,
-                name: row.customer.name,
+                id: row.customer_id,
+                name: row.customer_name,
             },
             game: {
-                id: row.game.id,
-                name: row.game.name,
+                id: row.game_id,
+                name: row.game_name,
             },
         }));
 
@@ -92,10 +94,30 @@ export async function finishRentals(req, res) {
         let delayFee = null;
 
         if (diffDays > daysRented) {
-            delayFee = diffDays * pricePerDay;
+            delayFee = (diffDays - daysRented) * pricePerDay;
         }  
 
         await db.query(`UPDATE rentals SET "returnDate" = $1, "delayFee" = $2 WHERE id = $3;`, [returnDate, delayFee, id]);
+        res.sendStatus(200);
+
+    }catch (err) {
+        res.status(500).send(err.message);
+    }
+}
+
+export async function deleteRentals(req, res){
+    const {id} = req.params;
+
+    try {
+        const searchRental = await db.query(`SELECT * FROM rentals WHERE id = $1;`, [id]);
+
+        // Verificar se o aluguel existe
+        if (searchRental.rows.length === 0) return res.sendStatus(404);
+
+        // Verificar se o aluguel já não foi finalizado
+        if (searchRental.rows[0].returnDate !== null) return res.sendStatus(400);
+
+        await db.query(`DELETE FROM rentals WHERE id = $1;`, [id]);
         res.sendStatus(200);
 
     }catch (err) {
