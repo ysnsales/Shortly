@@ -87,14 +87,14 @@ export async function finishRentals(req, res) {
 
         // Veririfcar se o número de dias de aluguel foi ultrapassado
         const diffTime = Math.abs(returnDate.getTime() - rentDate.getTime()); // diferença em milissegundos
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // conversão para dias e arredondamento para cima
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); // conversão para dias e arredondamento para baixo
 
         const daysRented = searchRental.rows[0].daysRented
         const pricePerDay = (searchRental.rows[0].originalPrice) / daysRented; // preço do aluguel por dia
         let delayFee = null;
 
         if (diffDays > daysRented) {
-            delayFee = (daysRented - diffDays) * pricePerDay;
+            delayFee = (diffDays - daysRented) * pricePerDay;
         }  
 
         await db.query(`UPDATE rentals SET "returnDate" = $1, "delayFee" = $2 WHERE id = $3;`, [returnDate, delayFee, id]);
