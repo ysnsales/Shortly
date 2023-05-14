@@ -1,6 +1,6 @@
 import { db } from "../database/database.connection.js";
 
-export async function getRentals(req, res){
+export async function getRentals(req, res) {
     try{
         const getRentals = await db.query(
             `SELECT rentals.*, customers.id, customers.name, games.id, games.name FROM rentals 
@@ -18,12 +18,12 @@ export async function getRentals(req, res){
             originalPrice: row.originalPrice,
             delayFee: row.delayFee,
             customer: {
-                id: row.customer_id,
-                name: row.customer_name,
+                id: row.customer.id,
+                name: row.customer.name,
             },
             game: {
-                id: row.game_id,
-                name: row.game_name,
+                id: row.game.id,
+                name: row.game.name,
             },
         }));
 
@@ -62,6 +62,41 @@ export async function createRentals(req, res) {
                         VALUES ($1, $2, $3, $4, null, null, $5);`, 
                         [customerId, gameId, rentDate, daysRented, originalPrice ]);
         res.sendStatus(201);
+
+    }catch (err) {
+        res.status(500).send(err.message);
+    }
+};
+
+export async function finishRentals(req, res) {
+    const {id} = req.params;
+
+    try {
+        const searchRental = await db.query(`SELECT * FROM rentals WHERE id = $1;`, [id]);
+
+        // Verificar se o aluguel existe
+        if (searchRental.rows.length === 0) return res.sendStatus(404);
+
+        // Verificar se o aluguel já não foi finalizado
+        if (searchRental.rows[0].returnDate !== null) return res.sendStatus(400);
+
+        const returnDate = new Date();
+        const rentDate = searchRental.rows[0].rentDate;
+
+        // Veririfcar se o número de dias de aluguel foi ultrapassado
+        const diffTime = Math.abs(returnDate.getTime() - rentDate.getTime()); // diferença em milissegundos
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // conversão para dias e arredondamento para cima
+
+        const daysRented = searchRental.rows[0].daysRented
+        const pricePerDay = (searchRental.rows[0].originalPrice) / daysRented; // preço do aluguel por dia
+        let delayFee = null;
+
+        if (diffDays > daysRented) {
+            delayFee = diffDays * pricePerDay;
+        }  
+
+        await db.query(`UPDATE rentals SET "returnDate" = $1, "delayFee" = $2 WHERE id = $3;`, [returnDate, delayFee, id]);
+        res.sendStatus(200);
 
     }catch (err) {
         res.status(500).send(err.message);
