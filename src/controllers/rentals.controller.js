@@ -40,11 +40,11 @@ export async function createRentals(req, res) {
     try {
         //Verificar se existe usuário com o id passado
         const searchCustomerId = await db.query(`SELECT * FROM customers WHERE id = $1;`, [customerId]);
-        if (searchCustomerId.rows.length = 0) return res.sendStatus(400);
+        if (searchCustomerId.rows.length === 0) return res.sendStatus(400);
 
         //Verificar se existe jogo com o id passado
         const searchGameId = await db.query(`SELECT * FROM games WHERE id = $1;`, [gameId]);
-        if (searchGameId.rows.length = 0) return res.sendStatus(400);
+        if (searchGameId.rows.length === 0) return res.sendStatus(400);
 
         const searchRentals =  await db.query(`SELECT * FROM rentals WHERE "gameId" = $1 AND "returnDate" IS null;`, [gameId]);
 
@@ -52,6 +52,7 @@ export async function createRentals(req, res) {
         const availableGames = searchGameId.rows[0].stockTotal - searchRentals.rows.length;
         if (availableGames === 0) return res.sendStatus(400);
 
+        
         //Calcular o preço do aluguel e a data
         const originalPrice = daysRented * searchGameId.rows[0].pricePerDay;
         const rentDate = new Date();
