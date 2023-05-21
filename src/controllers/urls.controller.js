@@ -12,7 +12,8 @@ export async function shortenURL (req, res){
         const returnBody = await db.query(`SELECT * FROM urls WHERE shortUrl = $1;`, [shortened_url]);
         res.status(201).send({id : returnBody.rows[0].id, shortUrl : shortened_url});
 
-    } catch (err) {
+    } 
+    catch (err) {
         res.status(500).send(err.message);
     };
     
@@ -32,4 +33,19 @@ export async function getUrlById (req, res){
         res.status(500).send(err.message);
     };
 
+};
+
+export async function openShortUrl (req, res){
+    const {shortUrl} = req.params;
+    
+    try{
+        const checkUrl = await db.query(`SELECT * FROM  urls WHERE shortUrl = $1;`, [shortUrl]);
+        if (checkUrl.rows.length === 0) return res.sendStatus(404);
+
+        await db.query(`UPDATE urls SET views = views + 1, WHERE shortUrl = $1;`, [shortUrl]);
+        res.redirect(checkUrl.rows[0].link);
+    }    
+    catch (err) {
+        res.status(500).send(err.message);
+    };
 }
