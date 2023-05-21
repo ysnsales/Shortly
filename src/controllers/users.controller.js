@@ -70,7 +70,7 @@ export async function getUsersInfo (req, res){
 export async function getRanking (req, res){
     try{
         const getRank = await db.query(
-            `SELECT users.id, users.name, COUNT(urls."shortUrl") AS "linksCount', SUM(urls."visitCount") AS "visitCount"
+            `SELECT users.id, users.name, COUNT(urls."shortUrl") AS "linksCount", SUM(urls."visitCount") AS "visitCount"
             FROM users
             LEFT JOIN urls
             ON users.email = urls.user_email
