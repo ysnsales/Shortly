@@ -39,10 +39,10 @@ export async function openShortUrl (req, res){
     const {shortUrl} = req.params;
     
     try{
-        const checkUrl = await db.query(`SELECT * FROM  urls WHERE shortUrl = $1;`, [shortUrl]);
+        const checkUrl = await db.query(`SELECT * FROM  urls WHERE "shortUrl" = $1;`, [shortUrl]);
         if (checkUrl.rows.length === 0) return res.sendStatus(404);
 
-        await db.query(`UPDATE urls SET views = views + 1, WHERE shortUrl = $1;`, [shortUrl]);
+        await db.query(`UPDATE urls SET "visitCount" = "visitCount" + 1 WHERE "shortUrl" = $1;`, [shortUrl]);
         res.redirect(checkUrl.rows[0].link);
     }    
     catch (err) {

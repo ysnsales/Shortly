@@ -36,4 +36,33 @@ export async function signIn (req, res){
     }catch (err){
         res.status(500).send(err.message);
     }
+};
+
+export async function getUsersInfo (req, res){
+    const user_email = res.locals.session.user_email;
+
+    try{
+       
+        const urlsQuery = await db.query(`SELECT id, url, "shortUrl", "visitCount" FROM urls WHERE user_email = $1;`, [user_email]);
+        const getQuery = await db.query(
+            `SELECT users.id, users.name, SUM(urls."visitCount") AS total_visits 
+            FROM users 
+            JOIN urls 
+            ON users.email = urls.user_email
+            WHERE user_email = $1
+            GROUP BY users.id;`, [user_email]);
+     
+        const query = {
+            id : getQuery.rows[0].id,
+            name : getQuery.rows[0].name,
+            visitCount : getQuery.rows[0].total_visits,
+            shortenedUrls : urlsQuery.rows
+        }
+
+        res.status(200).send(query);
+
+    }
+    catch (err){
+        res.status(500).send(err.message);
+    }
 }
