@@ -30,8 +30,8 @@ export async function signIn (req, res){
         if (!checkPassword) return res.sendStatus(401);
 
         const token = uuid();
-        await db.query(`INSERT INTO sessions (user_name, user_id, token) VALUES ($1, $2, $3);`, [user.name, user.id, token]);
-        res.send([user.name, user.id, token])
+        await db.query(`INSERT INTO sessions (user_email, token) VALUES ($1, $2);`, [email, token]);
+        res.send([user.email, token])
 
     }catch (err){
         res.status(500).send(err.message);
