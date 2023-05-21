@@ -65,4 +65,24 @@ export async function getUsersInfo (req, res){
     catch (err){
         res.status(500).send(err.message);
     }
+};
+
+export async function getRanking (req, res){
+    try{
+        const getRank = await db.query(
+            `SELECT users.id, users.name, COUNT(urls."shortUrl") AS "linksCount', SUM(urls."visitCount") AS "visitCount"
+            FROM users
+            LEFT JOIN urls
+            ON users.email = urls.user_email
+            GROUP BY users.id
+            ORDER BY "visitCount" DESC
+            LIMIT 10;`
+            );
+
+            res.status(200).send(getRank.rows)
+
+    }
+    catch (err){
+        res.status(500).send(err.message);
+    }
 }
