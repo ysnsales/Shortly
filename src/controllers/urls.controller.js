@@ -2,15 +2,15 @@ import { db } from "../database/database.connection.js";
 import { nanoid } from "nanoid";
 
 export async function shortenURL (req, res){
-    const { url} = req.body; 
+    const { url } = req.body; 
     const  user_email  = res.locals.session.user_email;    
 
     try {
-        const shortened_url = nanoid(8);
-        await db.query(`INSERT INTO urls (url, shortUrl, user_email) VALUES ($1, $2, $3);`, [url, shortened_url, user_email]);
+        const shortUrl = nanoid(8);
+        await db.query(`INSERT INTO urls (url, "shortUrl", user_email) VALUES ($1, $2, $3);`, [url, shortUrl, user_email]);
      
-        const returnBody = await db.query(`SELECT * FROM urls WHERE shortUrl = $1;`, [shortened_url]);
-        res.status(201).send({id : returnBody.rows[0].id, shortUrl : shortened_url});
+        const returnBody = await db.query(`SELECT * FROM urls WHERE "shortUrl" = $1;`, [shortUrl]);
+        res.status(201).send({id : returnBody.rows[0].id, shortUrl : shortUrl});
 
     } 
     catch (err) {
@@ -48,4 +48,23 @@ export async function openShortUrl (req, res){
     catch (err) {
         res.status(500).send(err.message);
     };
+};
+
+export async function deleteUrl (req, res){
+    const { id } = req.params;
+    const user_email = res.locals.session.user_email;
+
+    try{
+        const checkUrlOwner = await db.query(`SELECT * FROM urls WHERE id = $1;`, [id]);
+        if (checkUrlOwner.rows.length === 0) return res.sendStatus(404);
+        if (checkUrlOwner.rows[0].user_email !== user_email) return res.sendStatus(401);
+        console.log(checkUrlOwner.rows[0])
+
+        await db.query(`DELETE FROM urls WHERE id = $1;`, [id]);
+        res.sendStatus(204);
+    }
+    catch (err) {
+        res.status(500).send(err.message);
+    };
+
 }
