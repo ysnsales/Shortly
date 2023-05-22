@@ -28,7 +28,7 @@ CREATE TABLE public.sessions (
     id integer NOT NULL,
     user_email text NOT NULL,
     token text NOT NULL,
-    createdat timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+    "createdAt" timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
@@ -61,7 +61,8 @@ CREATE TABLE public.urls (
     url text NOT NULL,
     "shortUrl" text NOT NULL,
     user_email text NOT NULL,
-    views integer DEFAULT 0 NOT NULL
+    "visitCount" integer DEFAULT 0 NOT NULL,
+    "createdAt" timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
@@ -94,7 +95,7 @@ CREATE TABLE public.users (
     name text NOT NULL,
     email text NOT NULL,
     password text NOT NULL,
-    createdat timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+    "createdAt" timestamp without time zone DEFAULT CURRENT_TIMESTAMP
 );
 
 
@@ -163,12 +164,27 @@ INSERT INTO public.sessions VALUES (17, 'joao@driven.com.br', 'bebe5f5e-3a43-46c
 INSERT INTO public.sessions VALUES (18, 'joao@driven.com.br', '714f7ce7-a52a-44ad-b83f-cb9a2b509570', '2023-05-21 16:12:01.598554');
 INSERT INTO public.sessions VALUES (19, 'joao@driven.com.br', 'bdcaf361-f1ae-4d17-ba94-a5178f86f945', '2023-05-21 16:20:01.285023');
 INSERT INTO public.sessions VALUES (20, 'joao@driven.com.br', '24c5aded-4b9a-41bf-b581-1d4595b1f655', '2023-05-21 16:21:00.741452');
+INSERT INTO public.sessions VALUES (21, 'joao@driven.com.br', 'f11b464b-9e07-4b28-8e06-b9db191eb568', '2023-05-21 17:15:39.326123');
+INSERT INTO public.sessions VALUES (22, 'joao@driven.com.br', '50335674-48e8-4460-8c5b-f1c5266b855d', '2023-05-21 17:17:12.021152');
+INSERT INTO public.sessions VALUES (23, 'joao@driven.com.br', '6de1682f-92e6-4adb-9f24-2dc4f6441a5c', '2023-05-21 17:22:04.791241');
+INSERT INTO public.sessions VALUES (24, 'joao@driven.com.br', 'ce24927e-19ac-4658-9e85-d3f388b901e0', '2023-05-21 17:35:09.136671');
+INSERT INTO public.sessions VALUES (25, 'joao@driven.com.br', '6999c427-d23f-4ed4-9330-d178e497db9f', '2023-05-21 17:40:16.976359');
+INSERT INTO public.sessions VALUES (26, 'joao@driven.com.br', '446bb185-96f7-4926-95b9-4ed26d219f68', '2023-05-21 18:14:26.247083');
+INSERT INTO public.sessions VALUES (27, 'joao@driven.com.br', '59921471-2a3b-4f3b-8026-3a50176d21d3', '2023-05-21 18:31:20.523845');
+INSERT INTO public.sessions VALUES (28, 'joao@driven.com.br', '47f295da-c216-415b-9c44-09603ed66571', '2023-05-21 18:36:26.636076');
+INSERT INTO public.sessions VALUES (29, 'maria@driven.com.br', '6a12126c-e242-49fc-9367-c6726ad5f1a5', '2023-05-21 20:06:46.063234');
+INSERT INTO public.sessions VALUES (30, 'maria2@driven.com.br', 'c086b267-e3c5-4cee-961f-c3d706321289', '2023-05-21 20:08:59.742569');
 
 
 --
 -- Data for Name: urls; Type: TABLE DATA; Schema: public; Owner: -
 --
 
+INSERT INTO public.urls VALUES (3, 'https://...', 'RoQTsFjv', 'joao@driven.com.br', 0, '2023-05-21 20:13:48.419298');
+INSERT INTO public.urls VALUES (2, 'https://...', 'ia8Ur1BC', 'joao@driven.com.br', 1, '2023-05-21 20:13:48.419298');
+INSERT INTO public.urls VALUES (4, 'https://...', 'qPmjybT5', 'joao@driven.com.br', 1, '2023-05-21 20:13:48.419298');
+INSERT INTO public.urls VALUES (5, 'https://www.google.com/search?q=raposa&client=ubuntu&hs=L1G&channel=fs&sxsrf=APwXEdfvm-Ff1zfVYTJQ3PtM30PjbQVs3g:1684710440415&source=lnms&tbm=isch&sa=X&ved=2ahUKEwilr-a6w4f_AhUArJUCHUHPDycQ_AUoAXoECAEQAw&biw=1848&bih=968&dpr=1#imgrc=YmllAsdde4C6tM', 'r0lwcOHw', 'maria@driven.com.br', 2, '2023-05-21 20:13:48.419298');
+INSERT INTO public.urls VALUES (6, 'https://www.google.com/search?q=raposa&client=ubuntu&hs=L1G&channel=fs&sxsrf=APwXEdfvm-Ff1zfVYTJQ3PtM30PjbQVs3g:1684710440415&source=lnms&tbm=isch&sa=X&ved=2ahUKEwilr-a6w4f_AhUArJUCHUHPDycQ_AUoAXoECAEQAw&biw=1848&bih=968&dpr=1#imgrc=YmllAsdde4C6tM', 'szchRV7T', 'maria2@driven.com.br', 1, '2023-05-21 20:13:48.419298');
 
 
 --
@@ -176,27 +192,29 @@ INSERT INTO public.sessions VALUES (20, 'joao@driven.com.br', '24c5aded-4b9a-41b
 --
 
 INSERT INTO public.users VALUES (1, 'João', 'joao@driven.com.br', '$2b$10$FVLMrb0803Eoe1Tgx83w7.7wtkyjf8GeMT/ZAnzP5e.tfLrrajreq', '2023-05-21 15:02:49.912663');
+INSERT INTO public.users VALUES (2, 'João', 'maria@driven.com.br', '$2b$10$E9tz5DJm/7tyoNUQWQlKBOEFk.rkuB1AVzpLtc39ck6D5xluKSuGO', '2023-05-21 20:06:43.172474');
+INSERT INTO public.users VALUES (3, 'maria', 'maria2@driven.com.br', '$2b$10$dfkaqG0WBbNykARCAsqAQu/lfwm1MEvGenpuejzW4FtgMh8mbqu9C', '2023-05-21 20:08:52.32583');
 
 
 --
 -- Name: sessions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.sessions_id_seq', 20, true);
+SELECT pg_catalog.setval('public.sessions_id_seq', 30, true);
 
 
 --
 -- Name: urls_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.urls_id_seq', 1, false);
+SELECT pg_catalog.setval('public.urls_id_seq', 6, true);
 
 
 --
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 1, true);
+SELECT pg_catalog.setval('public.users_id_seq', 3, true);
 
 
 --
