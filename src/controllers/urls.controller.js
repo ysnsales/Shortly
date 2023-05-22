@@ -27,7 +27,7 @@ export async function getUrlById (req, res){
         if (checkUrl.rows.length === 0) return res.sendStatus(404);
 
         const shortUrl = await db.query(`SELECT id, "shortUrl", "url" FROM urls WHERE id = $1;`, [id]); 
-        res.status(201).send(shortUrl.rows[0]);
+        res.status(200).send(shortUrl.rows[0]);
     }
     catch (err) {
         res.status(500).send(err.message);
