@@ -43,7 +43,7 @@ export async function openShortUrl (req, res){
         if (checkUrl.rows.length === 0) return res.sendStatus(404);
 
         await db.query(`UPDATE urls SET "visitCount" = "visitCount" + 1 WHERE "shortUrl" = $1;`, [shortUrl]);
-        res.redirect(checkUrl.rows[0].link);
+        res.status(302).redirect(checkUrl.rows[0].link);
     }    
     catch (err) {
         res.status(500).send(err.message);
